@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  ws:
+    restart: always
+    build: './src/ws'
+    volumes:
+      - './src/ws:/app'
+      - './data:/data'
+    ports:
+      - '8000:80'

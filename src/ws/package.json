@@ -1,0 +1,11 @@
+{
+  "name": "binance-ws",
+  "version": "0.1.0",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "socket.io": "^4.7.4",
+    "ws": "^8.16.0"
+  }
+}
