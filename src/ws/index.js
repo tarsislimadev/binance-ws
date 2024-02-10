@@ -2,7 +2,7 @@ const { EventEmitter } = require('events')
 const { createServer } = require('http')
 const { Server } = require('socket.io')
 const WebSocket = require('ws')
-const { switchRequest } = require('./messages.js')
+const { toRequest, fromResponse } = require('./messages.js')
 
 const server = createServer()
 const io = new Server(server, { cors: { origin: '*' } })
@@ -19,7 +19,7 @@ io.on('connection', (socket) => {
     save('send', { id, method, params })
   }
 
-  socket.on('message', (data) => send(JSON.parse(data)))
+  socket.on('message', (data) => send(toRequest(data)))
 
   const retrieve = (message = {}) => {
     console.log('retrieve', message, typeof message)
@@ -27,7 +27,7 @@ io.on('connection', (socket) => {
     save('retrieve', message)
   }
 
-  ws.addListener('message', (data) => retrieve(JSON.parse(data.toString())))
+  ws.addListener('message', (data) => retrieve(fromResponse(data)))
 })
 
-server.listen(80, () => console.log('httpServer.listen 80'))
+server.listen(80, () => console.log('server.listen 80'))

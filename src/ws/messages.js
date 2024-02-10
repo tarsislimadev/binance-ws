@@ -1,55 +1,61 @@
 const { APIKey, UserId, APISecret } = require('./config.js')
 const { createHmac } = require('crypto')
 
-module.exports.sessionStatus = ({ id, method, params }) => ({ id, method, params })
+const createQuery = (params) => Object.keys(params).map((param) => `${param}=${params[param]}`).join('&').toString()
 
-module.exports.sessionLogon = ({ id, method, params }) => ({ id, method, params })
+const createSignatureHash = (params, timestamp, apiKey) => createHmac('sha1', APISecret).update(createQuery({ apiKey, ...params, timestamp })).digest('hex').toString()
 
-module.exports.sessionLogout = ({ id, method, params }) => ({ id, method, params })
+const createParams = (params, apiKey = APIKey, timestamp = Date.now()) => ({ ...params, apiKey, signature: createSignatureHash(params, timestamp, apiKey), timestamp })
 
-module.exports.orderTest = ({ id, method, params }) => ({ id, method, params })
+const sessionStatus = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.orderPlace = ({ id, method, params }) => ({ id, method, params })
+const sessionLogon = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.orderStatus = ({ id, method, params }) => ({ id, method, params })
+const sessionLogout = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.orderCancel = ({ id, method, params }) => ({ id, method, params })
+const orderTest = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.orderCancelReplace = ({ id, method, params }) => ({ id, method, params })
+const orderPlace = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.openOrdersStatus = ({ id, method, params }) => ({ id, method, params })
+const orderStatus = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.openOrdersCancelAll = ({ id, method, params }) => ({ id, method, params })
+const orderCancel = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.orderListStatus = ({ id, method, params }) => ({ id, method, params })
+const orderCancelReplace = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.orderListPlace = ({ id, method, params }) => ({ id, method, params })
+const openOrdersStatus = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.orderListCancel = ({ id, method, params }) => ({ id, method, params })
+const openOrdersCancelAll = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.openOrderListsStatus = ({ id, method, params }) => ({ id, method, params })
+const orderListStatus = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.sorOrderPlace = ({ id, method, params }) => ({ id, method, params })
+const orderListPlace = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.sorOrderTest = ({ id, method, params }) => ({ id, method, params })
+const orderListCancel = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.accountStatus = ({ id, method, params }) => ({ id, method, params })
+const openOrderListsStatus = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.accountCommission = ({ id, method, params }) => ({ id, method, params })
+const sorOrderPlace = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.accountRateLimitsOrders = ({ id, method, params }) => ({ id, method, params })
+const sorOrderTest = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.allOrders = ({ id, method, params }) => ({ id, method, params })
+const accountStatus = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.allOrderLists = ({ id, method, params }) => ({ id, method, params })
+const accountCommission = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.myTrades = ({ id, method, params }) => ({ id, method, params })
+const accountRateLimitsOrders = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.myPreventedMatches = ({ id, method, params }) => ({ id, method, params })
+const allOrders = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.myAllocations = ({ id, method, params }) => ({ id, method, params })
+const allOrderLists = ({ id, method, params }) => ({ id, method, params: createParams(params) })
 
-module.exports.switchRequest = ({ id, method, params }) => {
+const myTrades = ({ id, method, params }) => ({ id, method, params: createParams(params) })
+
+const myPreventedMatches = ({ id, method, params }) => ({ id, method, params: createParams(params) })
+
+const myAllocations = ({ id, method, params }) => ({ id, method, params: createParams(params) })
+
+const switchRequest = ({ id, method, params }) => {
   switch (method) {
     case 'session.status': return sessionStatus({ id, method, params })
     case 'session.logon': return sessionLogon({ id, method, params })
@@ -79,3 +85,9 @@ module.exports.switchRequest = ({ id, method, params }) => {
 
   return ({ id, method, params })
 }
+
+const toRequest = (data) => switchRequest(JSON.parse(data.toString()))
+
+const fromResponse = (data) => JSON.parse(data.toString())
+
+module.exports = { toRequest, fromResponse }
