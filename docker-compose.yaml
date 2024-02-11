@@ -9,3 +9,9 @@ services:
       - './data:/data'
     ports:
       - '8000:80'
+  ee:
+    restart: always
+    build: './src/ee'
+    volumes:
+      - './src/ee:/app'
+      - './data:/data'
