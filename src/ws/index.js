@@ -1,8 +1,12 @@
 const { EventEmitter } = require('events')
 const { createServer } = require('http')
 const { Server } = require('socket.io')
+const express = require('express')
 const WebSocket = require('ws')
-const server = createServer()
+
+const app = express()
+app.use(express.static('public'))
+const server = createServer(app)
 const io = new Server(server, { cors: { origin: '*' } })
 const ee = new EventEmitter()
 
