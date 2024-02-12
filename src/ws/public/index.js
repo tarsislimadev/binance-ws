@@ -1,6 +1,7 @@
 import { HTML, nFlex } from '@brtmvdl/frontend'
 import { FormHTML, MessagesHTML } from './components/index.js'
 import { CloseMessagesModel, ErrorMessagesModel, MessagesModel, OpenMessagesModel } from './models/index.js'
+
 import 'socket.io-client'
 
 export class Page extends HTML {
@@ -47,20 +48,21 @@ export class Page extends HTML {
     this.addMessage(new OpenMessagesModel(data))
   }
 
-  onFrontSocketMessage({ data } = {}) {
-    this.addMessage(this.getMessageInstance(JSON.parse(data)))
+  onFrontSocketMessage(data) {
+    this.addMessage(this.getMessageInstance(JSON.parse(data.toString())))
   }
 
-  getMessageInstance(data) {
-    const error = data.status === 400
-    const method = this.getMessageMethodById(data.id)
-    const params = error ? data.error : data.result
+  getMessageInstance(message) {
+    const error = message.status === 400
+    const method = this.getMessageMethod(message)
+    const params = error ? message.error : message.result
     const side = error ? 'error' : 'output'
     return new MessagesModel(method, params, side)
   }
 
-  getMessageMethodById(message_id) {
-    return this.state.messages.find(({ id }) => id === message_id)?.method
+  getMessageMethod(message) {
+    if (message.id === -1) return message.result.method
+    return this.state.messages.find(({ id }) => id === message.id)?.method
   }
 
   onFrontSocketError(data) {

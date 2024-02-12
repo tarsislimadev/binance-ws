@@ -105,7 +105,7 @@ export class errorMessage extends MessageCardHTML {
   }
 }
 
-export class pingMessage extends MessageCardHTML {
+export class nullMessage extends MessageCardHTML {
   getInputHTML() {
     return new HTML()
   }
@@ -114,6 +114,12 @@ export class pingMessage extends MessageCardHTML {
     return new HTML()
   }
 }
+
+export class pingMessage extends nullMessage { }
+
+export class openMessage extends nullMessage { }
+
+export class closeMessage extends nullMessage { }
 
 export class timeMessage extends MessageCardHTML {
   getInputHTML() {

@@ -21,15 +21,21 @@ io.on('connection', (socket) => {
     save('send', { id, method, params })
   }
 
-  socket.on('message', (data) => console.log(data))
+  socket.on('message', (data) => send(JSON.parse(data.toString())))
 
   const retrieve = (message = {}) => {
     console.log('retrieve', message, typeof message)
-    socket.emit('message', message)
+    socket.send(JSON.stringify(message))
     save('retrieve', message)
   }
 
-  ws.addListener('message', (data) => console.log(data))
+  ws.addListener('open', (data) => retrieve({ id: -1, status: 200, result: { method: 'open', params: { datetime: Date.now() } } }))
+
+  ws.addListener('close', (data) => retrieve({ id: -1, status: 200, result: { method: 'close', params: { datetime: Date.now() } } }))
+
+  ws.addListener('error', (data) => retrieve({ id: -1, status: 200, result: { method: 'error', params: data } }))
+
+  ws.addListener('message', (data) => retrieve(JSON.parse(data.toString())))
 })
 
 server.listen(80, () => console.log('server.listen 80'))
