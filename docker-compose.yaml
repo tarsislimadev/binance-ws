@@ -15,3 +15,9 @@ services:
     volumes:
       - './src/ee:/app'
       - './data:/data'
+  test:
+    restart: always
+    build: './src/test'
+    volumes:
+      - './src/test:/app'
+      - './data:/data'
