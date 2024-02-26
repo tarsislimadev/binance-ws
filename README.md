@@ -12,6 +12,10 @@ To get data from Binance.
 bash env/up.sh 
 ```
 
+## 
+
+[Signals on Wikipedia](https://en.wikipedia.org/wiki/Signal_(IPC)#SIGINT)
+
 ## license
 
 [MIT](./LICENSE)
