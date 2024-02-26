@@ -1,3 +1,5 @@
+const { createHmac } = require('node:crypto');
+
 const WebSocket = require('ws')
 
 const ws = new WebSocket('wss://ws-api.binance.com/ws-api/v3')
@@ -8,9 +10,7 @@ const { OutputMessageModel } = require('./models/output.message.model.js')
 
 const { uuidv4 } = require('./utils/str.js')
 
-const { quoteOrderQty, apiKey, secretKey } = require('./config.js')
-
-require('./utils/sha256.min.js')
+const { quoteOrderQty, apiKey, secretKey, symbol, type, timeInForce } = require('./config.js')
 
 const messages = []
 
@@ -24,9 +24,27 @@ const request = (message = new InputMessageModel()) => {
   ws.send(message.toString())
 }
 
-const run = (symbol = process.argv[2].toUpperCase()) => {
-  setInterval(() => request(new InputMessageModel('ping')), 1000 * 10)
-  request(new InputMessageModel('ticker.price', { symbol }))
+const signParams = (params = {}, timestamp = Date.now()) => {
+  params = { ...params, timestamp, apiKey }
+
+  const signature = createHmac('sha256', secretKey).update(Object.keys(params).sort().map((p) => `${p}=${params[p]}`).join('&')).digest('hex')
+
+  return { ...params, signature }
+}
+
+const mayBuy = (result) => log('mayBuy', uuidv4(), '', result)
+
+const buy = () => request(new InputMessageModel('order.test', signParams({ symbol, side: 'BUY', type, timeInForce, quoteOrderQty })))
+
+const maySell = (result) => log('maySell', uuidv4(), '', result)
+
+const sell = () => request(new InputMessageModel('order.test', signParams({ symbol, side: 'SELL', type, timeInForce, quoteOrderQty })))
+
+const run = () => {
+  // setInterval(() => request(new InputMessageModel('ping')), 1000 * 10)
+  // request(new InputMessageModel('ticker.price', { symbol }))
+  //
+  buy()
 }
 
 const onOpen = () => run()
@@ -38,24 +56,6 @@ const onError = (data) => console.log('error', data)
 const getMethodById = (id) => messages.find((message) => message.id == id)?.method
 
 const onPingOutput = (message = new OutputMessageModel()) => request(new InputMessageModel('pong', message.params))
-
-const signParams = (params = {}, timestamp = Date.now()) => {
-  params = { ...params, timestamp, apiKey }
-
-  const hash = sha256.hmac.create(secretKey)
-  hash.update(Object.keys(params).sort().map((p) => `${p}=${params[p]}`).join('&'))
-  const signature = hash.hex()
-
-  return { ...params, signature }
-}
-
-const mayBuy = (result) => log('mayBuy', uuidv4(), '', result)
-
-const buy = (result) => request(new InputMessageModel('order.test', signParams({ symbol: result.symbol, side: 'BUY', type: 'MARKET', timeInForce: 'GTC', quoteOrderQty })))
-
-const maySell = (result) => log('maySell', uuidv4(), '', result)
-
-const sell = (result) => request(new InputMessageModel('order.test', signParams({ symbol: result.symbol, side: 'SELL', type: 'MARKET', timeInForce: 'GTC', quoteOrderQty })))
 
 const onTickerPriceOutput = (message = new OutputMessageModel()) => {
   setTimeout(() => request(new InputMessageModel('ticker.price', { symbol: message.result.symbol })), 500)

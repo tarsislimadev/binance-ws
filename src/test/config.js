@@ -1,7 +1,11 @@
-// 
+
+const [, , symbol = 'bnbusdt'] = process.argv
 
 module.exports = {
-  apiKey: '',
-  secretKey: '',
+  timeInForce: 'GTC',
   quoteOrderQty: 20,
+  type: 'MARKET',
+  secretKey: '',
+  apiKey: '',
+  symbol,
 }
