@@ -1,11 +1,13 @@
 const { Model } = require('./model.js')
 
+const { uuidv4 } = require('../utils/str.js')
+
 class MessageModel extends Model {
   id = null
   method = null
   params = {}
 
-  constructor(method, id = Date.now(), { params = {} } = {}) {
+  constructor(method, id = uuidv4(), { params = {} } = {}) {
     super()
     this.id = id
     this.method = method
