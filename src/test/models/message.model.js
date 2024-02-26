@@ -6,9 +6,11 @@ class MessageModel extends Model {
   id = null
   method = null
   params = {}
+  side = 'none'
 
-  constructor(method, id = uuidv4(), { params = {} } = {}) {
+  constructor(side, method, id = uuidv4(), { params = {} } = {}) {
     super()
+    this.side = side
     this.id = id
     this.method = method
     this.params = params

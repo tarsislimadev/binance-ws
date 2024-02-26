@@ -2,7 +2,7 @@ const { MessageModel } = require('./message.model.js')
 
 class InputMessageModel extends MessageModel {
   constructor(method, input = {}) {
-    super(method)
+    super('input', method)
     this.params = input
   }
 

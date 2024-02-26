@@ -6,7 +6,7 @@ class OutputMessageModel extends MessageModel {
   rateLimits = []
 
   constructor(method, { id, status, result, rateLimits = [] } = {}) {
-    super(method, id)
+    super('output', method, id)
     this.status = status
     this.result = result
     this.rateLimits = rateLimits
